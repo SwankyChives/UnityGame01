@@ -12,38 +12,62 @@ public class PlayerController : MonoBehaviour
     Collider playerCollider;
     float distToGround;
     bool jumpPressed;
+    Vector3 velocityLastFrame = Vector3.zero;
 
     // Start is called before the first frame update
     void Start()
     {
         playerRigidbody = GetComponent<Rigidbody>();
-        playerCollider = GetComponent<CapsuleCollider>();
-        distToGround = playerCollider.transform.localScale.y;
-            //transform.localScale.y / 2
+        playerCollider = GetComponent<BoxCollider>();
+        distToGround = playerCollider.transform.localScale.y + 0.05f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 direction = (new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))).normalized;
+        // calculates velocity
+        Vector3 direction = (new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0));
         velocity = direction * speed;
 
+        // activates jump
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded() && (jumpPressed == false)) {
             jumpPressed = true;
         }
+
+        //Debug.DrawRay(transform.position + Vector3.left * (transform.localScale.x - 0.01f) / 2, Vector3.down, Color.red, distToGround);
+
+        print(IsGrounded());
     }
 
     private void FixedUpdate() {
+
+        // jump
         if (jumpPressed == true) {
-            playerRigidbody.AddForce(0, jumpForce, 0);
+            playerRigidbody.velocity += Vector3.up * jumpForce;
             jumpPressed = false;
         }
-        playerRigidbody.transform.Translate(velocity * Time.fixedDeltaTime, Space.World);
+
+        // checks if player is on ground, then moves.
+        if (IsGrounded()) {
+            playerRigidbody.velocity += velocity * Time.fixedDeltaTime;
+        }
+
         //playerRigidbody.constraints = RigidbodyConstraints.FreezeRotationX;
         //playerRigidbody.constraints = RigidbodyConstraints.FreezeRotationZ;
     }
 
+    // tests if player is on ground (taken from multiple rays, definitely better way to do this.
     bool IsGrounded() {
+        return (IsGroundedLeft() || IsGroundedRight() || IsGroundedCentre());
+    }
+
+    bool IsGroundedRight() {
+        return Physics.Raycast(transform.position + Vector3.right * (transform.localScale.x) / 2, Vector3.down, distToGround);
+    }
+    bool IsGroundedLeft() {
+        return Physics.Raycast(transform.position + Vector3.left * (transform.localScale.x) / 2, Vector3.down, distToGround);
+    }
+    bool IsGroundedCentre() {
         return Physics.Raycast(transform.position, Vector3.down, distToGround);
     }
 }
