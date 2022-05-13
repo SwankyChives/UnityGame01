@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     {
         playerRigidbody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<BoxCollider>();
-        distToGround = playerCollider.transform.localScale.y + 0.05f;
+        distToGround = playerCollider.transform.localScale.y;
     }
 
     // Update is called once per frame
@@ -30,19 +30,19 @@ public class PlayerController : MonoBehaviour
         velocity = direction * speed;
 
         // activates jump
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded() && (jumpPressed == false)) {
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && IsGrounded() && (jumpPressed == false)) {
             jumpPressed = true;
         }
 
         //Debug.DrawRay(transform.position + Vector3.left * (transform.localScale.x - 0.01f) / 2, Vector3.down, Color.red, distToGround);
 
-        print(IsGrounded());
+        //print(IsGrounded());
     }
 
     private void FixedUpdate() {
 
         // jump
-        if (jumpPressed == true) {
+        if (jumpPressed == true && IsGrounded()) {
             playerRigidbody.velocity += Vector3.up * jumpForce;
             jumpPressed = false;
         }
