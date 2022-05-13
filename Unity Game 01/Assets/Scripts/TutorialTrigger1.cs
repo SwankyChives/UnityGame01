@@ -29,6 +29,6 @@ public class TutorialTrigger1 : MonoBehaviour {
         textwall1.SetActive(false);
         textwall2.SetActive(true);
         gameObject.SetActive(false);
-        print("Object entered the trigger");
+        //print("Object entered the trigger");
     }
 }

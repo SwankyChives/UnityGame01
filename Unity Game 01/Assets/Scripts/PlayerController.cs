@@ -19,7 +19,8 @@ public class PlayerController : MonoBehaviour
     {
         playerRigidbody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<BoxCollider>();
-        distToGround = playerCollider.transform.localScale.y;
+        distToGround = playerCollider.bounds.extents.y;
+        //distToGround = playerCollider.transform.localScale.y;
     }
 
     // Update is called once per frame
