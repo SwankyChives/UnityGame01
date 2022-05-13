@@ -29,8 +29,10 @@ public class PlayerController : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        playerRigidbody.transform.Translate(velocity * Time.fixedDeltaTime);
+        playerRigidbody.transform.Translate(velocity * Time.fixedDeltaTime, Space.World);
         distToGround = transform.localScale.y / 2;
+        //Quaternion rotationLock = Quaternion.Euler(playerRigidbody.rotation.x, 0, playerRigidbody.rotation.z);
+        //playerRigidbody.rotation = rotationLock;
     }
 
     bool IsGrounded() {
