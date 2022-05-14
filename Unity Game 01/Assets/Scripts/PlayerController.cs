@@ -111,7 +111,10 @@ public class PlayerController : MonoBehaviour
             Text3();
         }
         if (triggerCollider.gameObject.tag == "Finish") {
-            SceneManager.LoadScene("Level1");
+            Application.Quit();
+        }
+        if (triggerCollider.gameObject.tag == "Respawn") {
+            SceneManager.LoadScene("Concept");
         }
     }
 }
