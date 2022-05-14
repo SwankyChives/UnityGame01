@@ -34,7 +34,7 @@ public class TutorialTrigger1 : MonoBehaviour {
 
     void Update() {
         //playerRigidbody.velocity.normalized;
-        newTextSpawn = playerReference.transform.position + (playerRigidbody.velocity.normalized * textSpawnDist);
+        newTextSpawn = playerReference.transform.position + (playerRigidbody.velocity.normalized * textSpawnDist) + Vector3.back * 7;
     }
 
     void OnTriggerEnter(Collider other) {

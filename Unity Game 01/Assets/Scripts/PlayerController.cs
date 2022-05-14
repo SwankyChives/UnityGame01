@@ -54,6 +54,8 @@ public class PlayerController : MonoBehaviour
         if (jumpPressed == true && isGrounded && RayIsGrounded()) {
             playerRigidbody.velocity += Vector3.up * jumpForce;
             jumpPressed = false;
+        } else {
+            jumpPressed = false;
         }
 
         // checks if player is on ground, then moves.
