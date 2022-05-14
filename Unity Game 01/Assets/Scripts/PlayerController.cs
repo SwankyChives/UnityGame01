@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,14 +14,20 @@ public class PlayerController : MonoBehaviour
     Collider playerCollider;
     float distToGround;
     bool jumpPressed;
-    Vector3 velocityLastFrame = Vector3.zero;
+    bool isGrounded;
+    public event Action Text1;
+    public event Action Text2;
+    public event Action Text3;
+
+    //Vector3 velocityLastFrame = Vector3.zero;
 
     // Start is called before the first frame update
     void Start()
     {
         playerRigidbody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<BoxCollider>();
-        distToGround = playerCollider.bounds.extents.y;
+        distToGround = playerCollider.bounds.extents.y + 0.1f;
+        playerRigidbody.velocity = Vector3.zero;
         //distToGround = playerCollider.transform.localScale.y;
     }
 
@@ -31,7 +39,7 @@ public class PlayerController : MonoBehaviour
         velocity = direction * speed;
 
         // activates jump
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && IsGrounded() && (jumpPressed == false)) {
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded && (jumpPressed == false)) {
             jumpPressed = true;
         }
 
@@ -43,13 +51,13 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate() {
 
         // jump
-        if (jumpPressed == true && IsGrounded()) {
+        if (jumpPressed == true && isGrounded && RayIsGrounded()) {
             playerRigidbody.velocity += Vector3.up * jumpForce;
             jumpPressed = false;
         }
 
         // checks if player is on ground, then moves.
-        if (IsGrounded()) {
+        if (isGrounded) {
             playerRigidbody.velocity += velocity * Time.fixedDeltaTime;
         }
 
@@ -58,17 +66,52 @@ public class PlayerController : MonoBehaviour
     }
 
     // tests if player is on ground (taken from multiple rays, definitely better way to do this.
-    bool IsGrounded() {
-        return (IsGroundedLeft() || IsGroundedRight() || IsGroundedCentre());
+    
+    bool RayIsGrounded() {
+        return (RayIsGroundedLeft() || RayIsGroundedRight() || RayIsGroundedCentre());
     }
 
-    bool IsGroundedRight() {
-        return Physics.Raycast(transform.position + Vector3.right * (transform.localScale.x) / 2, Vector3.down, distToGround);
+    bool RayIsGroundedRight() {
+        return Physics.Raycast(transform.position + Vector3.right * (transform.localScale.x - 0.01f) / 2, Vector3.down, distToGround);
     }
-    bool IsGroundedLeft() {
-        return Physics.Raycast(transform.position + Vector3.left * (transform.localScale.x) / 2, Vector3.down, distToGround);
+    bool RayIsGroundedLeft() {
+        return Physics.Raycast(transform.position + Vector3.left * (transform.localScale.x - 0.01f) / 2, Vector3.down, distToGround);
     }
-    bool IsGroundedCentre() {
+    bool RayIsGroundedCentre() {
         return Physics.Raycast(transform.position, Vector3.down, distToGround);
+    }
+
+    void OnCollisionEnter(Collision floorCollision) {
+        if (floorCollision.gameObject.tag == "floor") {
+            isGrounded = true;
+        }
+    }
+
+    void OnCollisionStay(Collision floorCollision) {
+        if (floorCollision.gameObject.tag == "floor") {
+            isGrounded = true;
+        }
+    }
+
+    void OnCollisionExit(Collision floorCollision) {
+        if (floorCollision.gameObject.tag == "floor") {
+            isGrounded = false;
+        }
+    }
+
+    void OnTriggerEnter(Collider triggerCollider) {
+        //makes the text appearences dynamically
+        if (triggerCollider.gameObject.tag == "text1") {
+            Text1();
+        }
+        if (triggerCollider.gameObject.tag == "text2") {
+            Text2();
+        }
+        if (triggerCollider.gameObject.tag == "text3") {
+            Text3();
+        }
+        if (triggerCollider.gameObject.tag == "Finish") {
+            SceneManager.LoadScene("Level1");
+        }
     }
 }
