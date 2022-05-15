@@ -11,7 +11,7 @@ public class CameraLockV2 : MonoBehaviour {
     Transform playerMarkerTransform;
     Rigidbody playerMarkerRigidbody;
     public float smoothSpeed;
-    //  public float markerSmoothSpeed;
+    //public float markerSmoothSpeed;
     //public float betterMarkerSmoothSpeed;
     public Vector3 offset;
     Vector3 markerSmoothVelocity;
@@ -20,9 +20,14 @@ public class CameraLockV2 : MonoBehaviour {
     
     public float dampenAmount;
     public float offsetDampen;
-    public float markerVelocityScalar;
+    //public float markerVelocityScalar;
+    //public float cameraVelocityScalar;
+    public float cameraOffsetScalar;
+    public float maxDistFromPlayer;
     Vector3 markerVelocity;
     Vector3 prevPos;
+    Vector3 velocityPosition;
+    //Vector3 prevCamPos;
 
     // Start is called before the first frame update
     void Start() {
@@ -32,6 +37,7 @@ public class CameraLockV2 : MonoBehaviour {
         playerMarkerTransform = marker.GetComponent<Transform>();
         playerMarkerRigidbody = marker.GetComponent<Rigidbody>();
         prevPos = playerMarkerTransform.position;
+        //prevCamPos = transform.position;
     }
 
     void Update() {
@@ -53,27 +59,38 @@ public class CameraLockV2 : MonoBehaviour {
 
 
         // finds desired position
+        
         Vector3 targetDirection = targetRigidbody.velocity * dampenAmount;
-        Vector3 velocityPosition = target.position + targetDirection;
-
-        
-        // 
-        markerVelocity = playerMarkerTransform.position - prevPos;
+        velocityPosition = target.position + targetDirection;
+        Vector3 offsetPosition = ((velocityPosition - playerMarkerTransform.position) * offsetDampen);
+        playerMarkerTransform.Translate(offsetPosition);
+        /*
+        markerVelocity = (playerMarkerTransform.position - prevPos);
         prevPos = playerMarkerTransform.position;
+        print(Time.fixedDeltaTime);
+
+        //markerVelocity = (playerMarkerTransform.position - prevPos) / Time.fixedDeltaTime;
+        //prevPos = playerMarkerTransform.position;
         
-        Vector3 markerPosWithVelocity = playerMarkerTransform.position + (markerVelocity * markerVelocityScalar * Time.fixedDeltaTime);
+        Vector3 markerPosWithVelocity = playerMarkerTransform.position + (markerVelocity * markerVelocityScalar);
         
         // Vector3 smoothedMarkerPosition = Vector3.SmoothDamp(target.position, velocityPosition, ref markerSmoothVelocity, markerSmoothSpeed * Time.deltaTime);
-        Vector3 relativeOffset = velocityPosition - markerPosWithVelocity;
+        Vector3 relativeOffset = velocityPosition - playerMarkerTransform.position;
         Vector3 relativeDesiredOffset = (markerPosWithVelocity + (relativeOffset / 2)) - playerMarkerTransform.position; 
-        playerMarkerTransform.Translate(relativeOffset * offsetDampen * Time.fixedDeltaTime);
-        print(markerVelocity);
+        
+        playerMarkerTransform.Translate(relativeDesiredOffset * offsetDampen);
+        //print(markerVelocity);
+        */
 
         transform.LookAt(playerMarkerTransform);
         //prevPos = playerMarkerTransform.position;
-        //smooths camera position
+        
+        // smooths camera transform
         Vector3 desiredPosition = target.position + offset;
-        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, desiredPosition, ref cameraVelocity, smoothSpeed * Time.deltaTime);
-        transform.position = smoothedPosition;
+        Vector3 cameraOffset = desiredPosition - transform.position;
+        transform.Translate(cameraOffset * cameraOffsetScalar);
+        
+        //transform.position = smoothedPosition;
+        //prevCamPos = transform.position;
     }
 }
